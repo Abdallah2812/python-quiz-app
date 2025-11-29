@@ -1,4 +1,3 @@
-
 from questions import QuestionManager
 from quiz import QuizManager
 from reports import ReportManager
@@ -13,7 +12,8 @@ def main():
         print("1. Add Question")
         print("2. Take Quiz")
         print("3. View Quiz Report")
-        print("4. Exit")
+        print("4. View Developers")
+        print("5. Exit")
 
         choice = input("Enter your choice: ")
 
@@ -24,6 +24,15 @@ def main():
         elif choice == "3":
             report_manager.show_report(quiz_manager)
         elif choice == "4":
+            print("\n" + "="*40)
+            print("DEVELOPED BY TEAM:")
+            print("="*40)
+            print("• Abdallahf")
+            print("• Shady")
+            print("• Yassin")
+            print("• Ali")
+            print("="*40)
+        elif choice == "5":
             print("Exiting... Goodbye!")
             break
         else:
