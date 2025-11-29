@@ -19,7 +19,6 @@ class QuestionManager:
 
     def add_question(self):
         category = input("Enter category (Python/OOP/Data/General): ").strip()
-        category = input("Enter category (Python/OOP/Data/General): ").strip()
         q_type = input("Enter question type (MCQ/TF): ").strip().upper()
         question_text = input("Enter the question: ")
 
