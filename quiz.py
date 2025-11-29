@@ -32,6 +32,9 @@ class QuizManager:
             print("\nCategory:", q["category"])
             print(q["question"])
 
+            print("\nCategory:", q["category"])
+            print(q["question"])
+
 
             if q["type"] == "MCQ":
                 for idx, opt in enumerate(q["options"], start=1):
