@@ -8,20 +8,30 @@ class QuizManager:
         self.total_questions = 0
 
     def take_quiz(self):
+        print("\n--- Choose Quiz Category ---")
+        category = input("Enter category (Python/OOP/Data/General): ").strip()
+        filtered_questions = [
+            q for q in self.question_manager.questions
+            if q["category"].lower() == category.lower()
+        ]
+        if not filtered_questions:
+            print("No questions found in this category!")
+            return
+
         if not self.question_manager.questions:
             print("No questions available. Please add questions first.")
             return
 
-        questions = random.sample(
-            self.question_manager.questions, 
-            min(5, len(self.question_manager.questions))
-        )
+        questions = random.sample(filtered_questions, min(5, len(filtered_questions)))
+
 
         self.score = 0
         self.total_questions = len(questions)
 
         for q in questions:
-            print("\n" + q["question"])
+            print("\nCategory:", q["category"])
+            print(q["question"])
+
 
             if q["type"] == "MCQ":
                 for idx, opt in enumerate(q["options"], start=1):

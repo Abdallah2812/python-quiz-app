@@ -18,6 +18,7 @@ class QuestionManager:
             json.dump(self.questions, f, indent=4)
 
     def add_question(self):
+        category = input("Enter category (Python/OOP/Data/General): ").strip()
         q_type = input("Enter question type (MCQ/TF): ").strip().upper()
         question_text = input("Enter the question: ")
 
@@ -37,6 +38,7 @@ class QuestionManager:
         question = {
             "id": len(self.questions) + 1,
             "type": q_type,
+            "category":category,
             "question": question_text,
             "options": options,
             "answer": answer
