@@ -1,12 +1,14 @@
 import random
 import time
 from colorama import Fore, Back, Style
+from analytics import Analytics
 
 class QuizManager:
     def __init__(self, question_manager):
         self.question_manager = question_manager
         self.score = 0
         self.total_questions = 0
+        self.analytics = Analytics()
 
     def take_quiz(self):
         print(Fore.CYAN + "\n" + "="*50)
@@ -100,6 +102,10 @@ class QuizManager:
             else:
                 print(Fore.RED + f"❌ INCORRECT")
                 print(Fore.GREEN + f"✅ Correct answer: {q['answer']}")
+        
+        quiz_time = len(questions) * 30
+        category_used = category if category else "All Categories"
+        self.analytics.add_quiz_result(self.score, self.total_questions, category_used, quiz_time)
         
         print(Fore.CYAN + f"\n{'='*50}")
         print(Fore.YELLOW + Style.BRIGHT + "🎯 QUIZ COMPLETED!")
