@@ -1,3 +1,6 @@
+from colorama import init, Fore, Back, Style
+init(autoreset=True)
+
 from questions import QuestionManager
 from quiz import QuizManager
 from reports import ReportManager
@@ -8,14 +11,16 @@ def main():
     report_manager = ReportManager()
 
     while True:
-        print("\n=== Python Quiz Application ===")
-        print("1. Add Question")
-        print("2. Take Quiz")
-        print("3. View Quiz Report")
-        print("4. View Developers")
-        print("5. Exit")
+        print(Fore.CYAN + "\n" + "="*40)
+        print(Fore.YELLOW + Style.BRIGHT + "🎯 PYTHON QUIZ APPLICATION")
+        print(Fore.CYAN + "="*40)
+        print(Fore.GREEN + "1. Add Question")
+        print(Fore.GREEN + "2. Take Quiz")
+        print(Fore.GREEN + "3. View Quiz Report")
+        print(Fore.BLUE + "4. View Developers")
+        print(Fore.RED + "5. Exit")
 
-        choice = input("Enter your choice: ")
+        choice = input(Fore.WHITE + "Enter your choice: ")
 
         if choice == "1":
             question_manager.add_question()
@@ -24,19 +29,19 @@ def main():
         elif choice == "3":
             report_manager.show_report(quiz_manager)
         elif choice == "4":
-            print("\n" + "="*40)
-            print("DEVELOPED BY TEAM:")
-            print("="*40)
-            print("• Abdallahf")
-            print("• Shady")
-            print("• Yassin")
-            print("• Ali")
-            print("="*40)
+            print(Fore.CYAN + "\n" + "="*40)
+            print(Fore.YELLOW + "DEVELOPED BY TEAM:")
+            print(Fore.CYAN + "="*40)
+            print(Fore.GREEN + "• Yassin (Team Leader)")
+            print(Fore.GREEN + "• Abdallah")
+            print(Fore.GREEN + "• Shady")
+            print(Fore.GREEN + "• Ali")
+            print(Fore.CYAN + "="*40)
         elif choice == "5":
-            print("Exiting... Goodbye!")
+            print(Fore.MAGENTA + "Exiting... Goodbye! 👋")
             break
         else:
-            print("Invalid choice. Try again.")
+            print(Fore.RED + "❌ Invalid choice. Please try again.")
 
 if __name__ == "__main__":
     main()
