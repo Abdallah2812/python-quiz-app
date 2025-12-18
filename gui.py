@@ -1,16 +1,22 @@
 import tkinter as tk
 from tkinter import messagebox, simpledialog
+try:
+    from questions import QuestionManager as FileQuestionManager
+except Exception:
+    FileQuestionManager = None
 
 # =========================================================
 #               INTERNAL DATA MANAGERS (NO FILES)
 # =========================================================
 
+
 class QuestionManager:
     def __init__(self):
         self.questions = []
-
-    def add_question(self, question, options, correct):
+    def add_question(self, category, question, options, correct, q_type="MCQ"):
         self.questions.append({
+            "category": category,
+            "type": q_type,
             "question": question,
             "options": options,
             "correct": correct
@@ -110,23 +116,83 @@ class QuizGUI:
                 command=cmd
             ).pack(pady=10)
 
+    def ask_choice(self, title, prompt, choices):
+        dlg = tk.Toplevel(self.root)
+        dlg.transient(self.root)
+        dlg.grab_set()
+        dlg.title(title)
+
+        tk.Label(dlg, text=prompt, font=("Arial", 12)).pack(padx=20, pady=(20, 10))
+
+        var = tk.StringVar(value=choices[0] if choices else "")
+        opt = tk.OptionMenu(dlg, var, *choices) if choices else tk.Label(dlg, text="No choices available")
+        opt.pack(padx=20, pady=10)
+
+        result = {"value": None}
+
+        def on_ok():
+            result["value"] = var.get()
+            dlg.destroy()
+
+        def on_cancel():
+            dlg.destroy()
+
+        btn_frame = tk.Frame(dlg)
+        tk.Button(btn_frame, text="OK", width=10, command=on_ok).pack(side="left", padx=5)
+        tk.Button(btn_frame, text="Cancel", width=10, command=on_cancel).pack(side="left", padx=5)
+        btn_frame.pack(pady=(10, 20))
+
+        self.root.wait_window(dlg)
+        return result["value"]
+
     # =====================================================
     #                 BUTTON FUNCTIONS
     # =====================================================
 
     def gui_add_question(self):
+        # Build category choices from file-based questions if available,
+        # otherwise fall back to common defaults.
+        choices = ["Python", "OOP", "Data", "General"]
+        if FileQuestionManager is not None:
+            try:
+                file_qm = FileQuestionManager()
+                file_cats = sorted({q.get("category") for q in file_qm.questions if q.get("category")})
+                if file_cats:
+                    choices = file_cats
+            except Exception:
+                pass
+
+        category = self.ask_choice("Category", "Select a category:", choices)
+        if not category:
+            return
+
         q = simpledialog.askstring("Add Question", "Enter the question:")
         if not q:
             return
 
+        q_type = self.ask_choice("Question Type", "Select question type:", ["MCQ", "TF"])
+        if not q_type:
+            return
+
         options = []
-        for i in range(4):
-            opt = simpledialog.askstring("Option", f"Enter option {i+1}:")
-            options.append(opt)
+        correct = None
+        if q_type == "MCQ":
+            for i in range(4):
+                opt = simpledialog.askstring("Option", f"Enter option {i+1}:")
+                options.append(opt)
 
-        correct = simpledialog.askinteger("Correct", "Correct option number (1-4):")
+            correct = simpledialog.askinteger("Correct", "Correct option number (1-4):")
+            if correct is None or not (1 <= correct <= 4):
+                messagebox.showwarning("Invalid", "Please enter a valid option number (1-4).")
+                return
+        else:  # TF
+            options = ["True", "False"]
+            tf_choice = self.ask_choice("Correct Answer", "Select the correct answer:", options)
+            if not tf_choice:
+                return
+            correct = tf_choice
 
-        self.qm.add_question(q, options, correct)
+        self.qm.add_question(category, q, options, correct, q_type)
         messagebox.showinfo("Success", "Question added!")
 
     def gui_take_quiz(self):
@@ -135,20 +201,25 @@ class QuizGUI:
             return
 
         score = 0
-
         for q in self.qm.questions:
-            user_answer = simpledialog.askinteger(
-                "Quiz",
-                f"{q['question']}\n"
-                f"1. {q['options'][0]}\n"
-                f"2. {q['options'][1]}\n"
-                f"3. {q['options'][2]}\n"
-                f"4. {q['options'][3]}\n\n"
-                f"Your answer:"
-            )
+            q_type = q.get("type", "MCQ")
+            if q_type == "MCQ":
+                prompt = f"{q['question']}\n\n"
+                for idx, opt in enumerate(q['options'], start=1):
+                    prompt += f"{idx}. {opt}\n"
+                prompt += "\nYour answer (option number):"
 
-            if user_answer == q["correct"]:
-                score += 1
+                user_answer = simpledialog.askinteger("Quiz", prompt)
+                if user_answer is None:
+                    continue
+                if user_answer == q["correct"]:
+                    score += 1
+            else:  # TF
+                tf_choice = self.ask_choice("Quiz - True/False", q['question'], ["True", "False"])
+                if not tf_choice:
+                    continue
+                if tf_choice == q["correct"]:
+                    score += 1
 
         self.quiz.score = score
         self.quiz.total_questions = len(self.qm.questions)
