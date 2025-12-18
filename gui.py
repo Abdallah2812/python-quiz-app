@@ -177,7 +177,11 @@ class QuizGUI:
             return
 
         q = simpledialog.askstring("Add Question", "Enter the question:")
-        if not q:
+        # If user cancelled, stop. If empty string, show error naming the field
+        if q is None:
+            return
+        if not q.strip():
+            messagebox.showerror("Missing Field", "Question text is required.")
             return
 
         q_type = self.ask_choice("Question Type", "Select question type:", ["MCQ", "TF"])
@@ -189,16 +193,26 @@ class QuizGUI:
         if q_type == "MCQ":
             for i in range(4):
                 opt = simpledialog.askstring("Option", f"Enter option {i+1}:")
+                # Cancelled -> stop flow
+                if opt is None:
+                    return
+                if not opt.strip():
+                    messagebox.showerror("Missing Field", f"Option {i+1} is required.")
+                    return
                 options.append(opt)
 
             correct = simpledialog.askinteger("Correct", "Correct option number (1-4):")
-            if correct is None or not (1 <= correct <= 4):
-                messagebox.showwarning("Invalid", "Please enter a valid option number (1-4).")
+            if correct is None:
+                messagebox.showerror("Missing Field", "Correct option number is required.")
+                return
+            if not (1 <= correct <= 4):
+                messagebox.showerror("Invalid Field", "Correct option number must be between 1 and 4.")
                 return
         else:  # TF
             options = ["True", "False"]
             tf_choice = self.ask_choice("Correct Answer", "Select the correct answer:", options)
-            if not tf_choice:
+            if tf_choice is None or not str(tf_choice).strip():
+                messagebox.showerror("Missing Field", "Correct answer for True/False is required.")
                 return
             correct = tf_choice
 
