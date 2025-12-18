@@ -4,6 +4,7 @@ try:
     from questions import QuestionManager as FileQuestionManager
 except Exception:
     FileQuestionManager = None
+import json
 
 # =========================================================
 #               INTERNAL DATA MANAGERS (NO FILES)
@@ -92,6 +93,15 @@ class QuizGUI:
             bg="#1e1e2f"
         )
         title.pack(pady=20)
+
+        # Add a dropdown for category selection in the GUI
+        self.category_label = tk.Label(self.root, text='Select Category:', bg="#1e1e2f", fg="white")
+        self.category_label.pack(pady=(10, 0))
+
+        self.category_var = tk.StringVar(self.root)
+        self.category_var.set('Select Category')  # default value
+        self.category_menu = tk.OptionMenu(self.root, self.category_var, 'Python', 'OOP', 'Data', 'General')
+        self.category_menu.pack(pady=(0, 20))
 
         buttons = [
             ("Add Question", self.gui_add_question),
@@ -200,8 +210,16 @@ class QuizGUI:
             messagebox.showwarning("No Questions", "Add questions first!")
             return
 
+        selected_category = self.category_var.get()
+        if selected_category == 'Select Category':
+            messagebox.showwarning("No Category", "Select a category first!")
+            return
+
         score = 0
         for q in self.qm.questions:
+            if q.get("category") != selected_category:
+                continue  # Skip questions not in the selected category
+
             q_type = q.get("type", "MCQ")
             if q_type == "MCQ":
                 prompt = f"{q['question']}\n\n"
@@ -222,7 +240,7 @@ class QuizGUI:
                     score += 1
 
         self.quiz.score = score
-        self.quiz.total_questions = len(self.qm.questions)
+        self.quiz.total_questions = len([q for q in self.qm.questions if q.get("category") == selected_category])
         self.analytics.add_attempt(score, len(self.qm.questions))
 
         messagebox.showinfo(
