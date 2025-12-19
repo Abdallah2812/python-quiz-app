@@ -1,0 +1,47 @@
+name: Python CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install colorama  # إذا كنت تستخدمه
+        
+    - name: Run basic tests
+      run: |
+        python -c "
+        # Test 1: Check if questions.py exists
+        import os
+        assert os.path.exists('questions.py'), 'questions.py missing'
+        
+        # Test 2: Check if quiz.py exists
+        assert os.path.exists('quiz.py'), 'quiz.py missing'
+        
+        # Test 3: Test QuestionManager
+        from questions import QuestionManager
+        qm = QuestionManager()
+        print('QuestionManager loaded successfully')
+        print(f'Total questions: {len(qm.questions)}')
+        "
+    
+    - name: Check Python syntax
+      run: |
+        python -m py_compile questions.py
+        python -m py_compile quiz.py
+        echo "✅ Syntax check passed"
