@@ -162,13 +162,16 @@ class QuizGUI:
     def gui_add_question(self):
         # Build category choices from file-based questions if available,
         # otherwise fall back to common defaults.
-        choices = ["Python", "OOP", "Data", "General"]
+        defaults = ["Python", "OOP", "Data", "General"]
+        choices = list(defaults)
         if FileQuestionManager is not None:
             try:
                 file_qm = FileQuestionManager()
-                file_cats = sorted({q.get("category") for q in file_qm.questions if q.get("category")})
-                if file_cats:
-                    choices = file_cats
+                file_cats = [c for c in sorted({q.get("category") for q in file_qm.questions if q.get("category")})]
+                # append file categories that are not already present in defaults
+                for c in file_cats:
+                    if c not in choices:
+                        choices.append(c)
             except Exception:
                 pass
 
