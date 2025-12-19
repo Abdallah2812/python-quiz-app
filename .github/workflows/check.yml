@@ -1,0 +1,30 @@
+name: Check Code
+
+on: [push]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get code
+        uses: actions/checkout@v3
+      
+      - name: Check Python
+        run: |
+          echo "🔍 Checking main.py..."
+          python -c "import main"
+          echo "✅ main.py OK"
+          
+          echo "🔍 Checking quiz.py..."
+          python -c "import quiz"
+          echo "✅ quiz.py OK"
+          
+          echo "🔍 Checking questions.py..."
+          python -c "import questions"
+          echo "✅ questions.py OK"
+          
+          echo "🔍 Checking analytics.py..."
+          python -c "import analytics"
+          echo "✅ analytics.py OK"
+          
+          echo "🎉 All files are good!"
