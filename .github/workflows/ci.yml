@@ -21,7 +21,11 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install colorama  # إذا كنت تستخدمه
+        if [ -f "requirements.txt" ]; then
+          pip install -r requirements.txt
+        else
+          pip install colorama
+        fi
         
     - name: Run basic tests
       run: |
